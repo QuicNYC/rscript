@@ -1,0 +1,75 @@
+%% LyX 2.0.6 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{beamer}
+\usepackage{mathptmx}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+ % this default might be overridden by plain title style
+ \newcommand\makebeamertitle{\frame{\maketitle}}%
+ \AtBeginDocument{
+   \let\origtableofcontents=\tableofcontents
+   \def\tableofcontents{\@ifnextchar[{\origtableofcontents}{\gobbletableofcontents}}
+   \def\gobbletableofcontents#1{\origtableofcontents}
+ }
+ \long\def\lyxframe#1{\@lyxframe#1\@lyxframestop}%
+ \def\@lyxframe{\@ifnextchar<{\@@lyxframe}{\@@lyxframe<*>}}%
+ \def\@@lyxframe<#1>{\@ifnextchar[{\@@@lyxframe<#1>}{\@@@lyxframe<#1>[]}}
+ \def\@@@lyxframe<#1>[{\@ifnextchar<{\@@@@@lyxframe<#1>[}{\@@@@lyxframe<#1>[<*>][}}
+ \def\@@@@@lyxframe<#1>[#2]{\@ifnextchar[{\@@@@lyxframe<#1>[#2]}{\@@@@lyxframe<#1>[#2][]}}
+ \long\def\@@@@lyxframe<#1>[#2][#3]#4\@lyxframestop#5\lyxframeend{%
+   \frame<#1>[#2][#3]{\frametitle{#4}#5}}
+ \def\lyxframeend{} % In case there is a superfluous frame end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+%\usetheme{Warsaw}
+\usetheme{Boadilla}
+% or ...
+
+\usecolortheme{orchid}
+\setbeamertemplate{footline}[text line]{} % makes the footer EMPTY
+
+\setbeamercovered{transparent}
+% or whatever (possibly just delete it)
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\title{Activity report 11/3/2014}
+
+%\beamerdefaultoverlayspecification{<+->}
+\makebeamertitle
+
+\lyxframeend{}\lyxframe{AR 11/3/2014}
+\begin{minipage}[t]{1\columnwidth}%
+\includegraphics[clip,scale=0.4]{preport}%
+\end{minipage}
+\lyxframeend{}
+
+\lyxframeend{}\lyxframe{AR 11/3/2014}
+\begin{minipage}[t]{1\columnwidth}%
+\includegraphics[clip,scale=0.4]{preport1}%
+\end{minipage}
+\lyxframeend{}
+
+\lyxframeend{}\lyxframe{AR 11/3/2014}
+\begin{minipage}[t]{1\columnwidth}%
+\includegraphics[clip,scale=0.4]{preport2}%
+\end{minipage}
+\lyxframeend{}
+
+\lyxframeend{}\lyxframe{AR 11/3/2014}
+\begin{minipage}[t]{1\columnwidth}%
+\includegraphics[clip,scale=0.4]{preport3}%
+\end{minipage}
+\lyxframeend{}
+
+
+\end{document}

@@ -1,0 +1,131 @@
+%% LyX 2.0.6 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[10pt,letter,twocolumn,english]{IEEEtran}
+\usepackage[LGR,T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{listings}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{calc}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage[]{algorithm2e}
+\usepackage{url}
+\singlespacing
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\pdfpageheight\paperheight
+\pdfpagewidth\paperwidth
+
+\DeclareRobustCommand{\greektext}{%
+  \fontencoding{LGR}\selectfont\def\encodingdefault{LGR}}
+\DeclareRobustCommand{\textgreek}[1]{\leavevmode{\greektext #1}}
+\DeclareFontEncoding{LGR}{}{}
+\DeclareTextSymbol{\~}{LGR}{126}
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+%% A simple dot to overcome graphicx limitations
+\newcommand{\lyxdot}{.}
+
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}
+\providecommand{\algorithmname}{Algorithm}
+\floatname{algorithm}{\protect\algorithmname}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\title{\large{Big Data : a tool for designing predictive models.}}
+
+
+\date{May 15, 2014}
+
+
+\author{Ted Brown - Eric Dagobert \\Graduate Center (CUNY)}
+\maketitle
+\begin{abstract}
+In this document we are presenting a tool offering features of data analysis and most importantly predictive modeling in the context of building data energy management. That is a particular context but the tool can easily be adapted to any type of data environment.As of Today, the implementation is made from New-York 's John Jay Building and contains thousands of data collected from hundreds of sensors over a period of two years, and  regularly updated.
+\end{abstract}
+\section*{Introduction}
+
+
+\noindent Architecture and design have been motivated by different constraints and  certainly modified several times before reaching the actual shape. Architecture sits on the following points: speed, easiness to use and share, and  flexibility. We first opted for R Studio that immediatly offered points 2 and 3 but there was a bottleneck in terms of performance. We ended up building a python based website offering python-like concepts accessible to users. 
+ 
+Here we will first show the contents of this tool and possibilities of immediate achievement in terms of predictive models. Next section goes into details relative to implementation and plugin development.
+Section 3 present different case studies in the domain of energy savings. This is followed by the conclusion.
+
+
+\section*{Data Model}
+One objective of this application is first to provide user with global views of the entire system. Indeed, with millions of data collected, filtering then graphing are the best way to represent system states over time at a glance.
+
+Data Model = table : a row = (s1,s2,s3, t), indexed columns {1},{2}
+ table with merged columns to simultaneously display several sensors
+
+step 1 : preselection of data (tree)
+step 2: data manipulation
+\subsection*{On-the-fly python code evaluation}
+-> format string constructed from user input
+-> 'eval' builtin called to apply format string on data table. 
+ 
+\subsection*{types of graph}
+\begin{itemize}
+\item time serie (combined): overview over time
+\item XY -> relations 1
+\item correlations -> relations 2
+\item histogram -> statistics (curve shape, dispersion)
+\item timeserie + moving average/standard dev -> statistics (abnormal behavior)
+\end{itemize}
+
+\subsection*{lambda functions: 1-filters}
+one global filter on time 
+one filter per value
+lambda functions
+
+-> quite powerful, allows complex time expressions with  hour, weekday , month etc. (datetime object)
+
+
+\subsection*{lambda functions: 2-expressions}
+
+equivalent to format string expression \{1\},\{2\}
+python + pandas: \{1\}.apply(lambda x) on every row
+many builtins : diff, percent, etc.
+
+Data Model = output table 
+(accessible : pdata)
+output redirected to any graph type
+
+\section* {Advanced features : lambda functions and plugins}
+ - share work (stored on server)
+ - complex data transformations : on timescale (row) or combining columns(sensors)
+ - simulation possible via a math. model or a data set (or a machine)
+ - accessible via expression box 
+ -- examples: col/col, row/row , row/col 
+ 
+\section* { Training and prediction for research}
+advantages:
+\begin{itemize}
+\item quickly determine whether there is a relation between different measured values (on a given timeslice)
+\item can try different machine types, different training sets and different training size
+\item results can be reinjected into another expression -> model verif
+\item sharing of results
+\end{itemize}
+sits on python scikit
+outputs consistent with data model -> used for feedback
+\section* { Case studies go here}
+
+-simple case : room temp with OAT and time of day
+-energy propagation from emitter to sensors :  SVM
+(add figures)
+\section*{Conclusion}
+
+Users :  researchers
+goals: energy savings, dysfunctionment prevention
+
+\end{document}

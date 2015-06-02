@@ -1,0 +1,685 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass paper
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing double
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip smallskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+BPL Lab User Guide
+\end_layout
+
+\begin_layout Abstract
+Web site 'rscript.cisdd.org' offers some basic tools to perform research on
+ building sensors data: visualization, basic statistics and forecast.
+ 
+\end_layout
+
+\begin_layout Abstract
+Developed in Django/Python, the application data model is based on Panda
+ objects and exposes a small set of Python functionalities to the user.
+\end_layout
+
+\begin_layout Abstract
+\begin_inset Graphics
+	filename general.png
+	scale 30
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Data Sources and graphing
+\end_layout
+
+\begin_layout Standard
+The site is provided with a collection of data coming from John Jay building
+ sensors.
+ As of today it contains about one year of every 15 minutes observations
+ of a thousand sensors.
+ Data are stored on a local slqlite database and updated asynchronously
+ by a separate process.
+ This architecture guarantees a quick and constant access time to data this
+ allowing complex computations in a reasonable amount of time.
+\end_layout
+
+\begin_layout Standard
+Data are presented in a tree, ordered by type, location and name:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename fig1.png
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From there, user can choose one or several sensor, an entire floor or an
+ entire category.
+ Once chosen, sensors are selected for analysis by pressing 'Push' to transfer
+ selection into the selection stack.
+\end_layout
+
+\begin_layout Subsection
+The selection stack
+\end_layout
+
+\begin_layout Standard
+Selection stack contains reference data that will be used during the analysis
+ session.
+ Data are implicitly indexed (0,1,2 etc.) and index references are used later
+ on during the filtering and the formatting phases.
+ To modify the order sequence the button 'Permute' will swap selected sensor
+ with the top of the stack.
+ 'Clear' will empty the stack and 'Pop' will remove the selected input.
+\end_layout
+
+\begin_layout Subsection
+The filter box
+\end_layout
+
+\begin_layout Standard
+Right under the selection stack we have the filter box: it consists in an
+ array of Python lambda functions in 'x' the user will write to filter out
+ input data.
+\end_layout
+
+\begin_layout Standard
+The filters are separated by ';' followed by a return.
+ Each line matches with the corresponding sensor from the sensor stack,
+ starting with the time axis:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename fig2.png
+	scale 70
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this example the first line is used to filters time axis, then sensor
+ 1 from the stack, followed by sensor 2 , etc.
+ Here we want data for which the observation month is either 5,6,7 or 8.
+ Then there is no constraint on sensor 1, and sensor 2 must have values
+ greater than 80.
+\end_layout
+
+\begin_layout Subsubsection
+The time axis filter
+\end_layout
+
+\begin_layout Standard
+The first line is a Python boolean lambda function in 'x' where 'x' is the
+ time, and more precisely it is a Python datetime object on which the following
+ members are defined:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+x.year, x.month, x.day, x.hour, x.minute, x.second, x.microsecond
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Also some functions:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+x.weekday(), x.replace()
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And comparison with a datetime object:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+x >= datetime(2013,2,1)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The complete documentation is available at :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://docs.python.org/2/library/datetime.html#datetime-objects
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+lambda x
+\end_layout
+
+\begin_layout Standard
+Almost all the sensors are represented by float 64 values, thus filters
+ will apply to Python floats.
+ Boolean expression and math functions are allowed, so it is possible to
+ build complex queries, but sub function definitions are not authorized.
+ Math functions must be prefixed by 'math.' .
+ Example :
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+math.log(x) > 2 and math.sin(x) == math.pi;
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+More on Python expressions:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://docs.python.org/2/reference/expressions.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+More on Python math module:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://docs.python.org/2/library/math.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+The expression boxes
+\end_layout
+
+\begin_layout Standard
+Under the filter text field there is another field we use to format data
+ output.
+ It is in fact like a Python string format expression, but it is destined
+ to be evaluated by the Python interpreter within the context of the analysis:
+ Every input is represented by a format field within brackets: {0},{1},
+ etc.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename fig3.png
+	BoundingBox 0bp 0bp 249bp 105bp
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There is two expression boxes: one for graphing of data, and the other for
+ learning.
+\end_layout
+
+\begin_layout Standard
+Behind these templates are Pandas objects, more precisely Pandas columns.
+ One has to see the output has a table where every column represents a particula
+r sensor (plus the time).
+ What is evaluated prior to graph is in fact a formatted expression.
+ Basic arithmetics and special functions are allowed, as well as basic boolean
+ expressions (for which we will prefer using the filter box because the
+ syntax is much lighter).
+\end_layout
+
+\begin_layout Itemize
+Reordering the output is then permitted : 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+{1},{0},{2}
+\end_layout
+
+\end_inset
+
+ will display sensor 2, sensor 1 then sensor 3.
+ This will be useful during the forecast/training phase.
+ Note : counting must starts at 0 and increments by 1.
+\end_layout
+
+\begin_layout Itemize
+Basic arithmetic:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+{1} - {0}, abs({1} - {0}), {1} - {0}/{1}*200
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Basic Pandas built-ins (only those that returns a set) :
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+{0}.diff(), {0}.pct_change(),{0}.cumsum()
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Special 'apply' function that allows math or lambda expressions:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+{0}.apply(math.sin), {0}.apply(lambda x : x if x <= 0 else math.log(x))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Special field '{t}' to access time axis: {t} represents a datetime object
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+{t}.apply(lambda x : x.hour % 4)
+\end_layout
+
+\begin_layout Plain Layout
+
+{t}.apply(lambda x : x.weekday())
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The complete Pandas documentation on basic functions and expressions is
+ available here:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://pandas.pydata.org/pandas-docs/stable/basics.html#function-application
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Graph Types
+\end_layout
+
+\begin_layout Standard
+Several graph types can be created.
+ The following menu gives the possible choices:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename graph.png
+	scale 70
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Data will be filtered out according to the filter box and several graphs
+ will be created following the template defined in the format box.
+\end_layout
+
+\begin_layout Itemize
+Time Series: Y's are the data, X is the time.
+\end_layout
+
+\begin_layout Itemize
+Moving Std: That will compute, for every data, the MA plus +/- 2 standard
+ deviations computed on a rolling period of 20 ticks (20 * 15 minutes).
+ It shows trend and values which are outside the STD envelope are likely
+ to be 'abnormal'.
+\end_layout
+
+\begin_layout Itemize
+XY : X axis is the first entry corresponding to the forma, Y's are the next
+ ones.
+ By default X is going to be the element on top of the stack.
+ But it is possible to graph more complex expressions; for instance {2}-{1},{0}
+ in the format box will display (sensor 2 - sensor 1) in X and (sensor 0)
+ in Y.
+ XY values are sorted and unique.
+\end_layout
+
+\begin_layout Itemize
+Correl: Shows a rolling windows (20 elements) of cross correlations between
+ the first set of values compared to the others.
+ 
+\end_layout
+
+\begin_layout Itemize
+Frequencies: Show an histogram of the value distribution, only for the first
+ element (for readability reasons)
+\end_layout
+
+\begin_layout Standard
+All this types are compatible with filters and formats detailed above.
+\end_layout
+
+\begin_layout Section
+Persistence
+\end_layout
+
+\begin_layout Standard
+The lab allows some basic persistence, it is possible to save/load a context
+ under a given name.
+ The context consists in :
+\end_layout
+
+\begin_layout Itemize
+sensor list
+\end_layout
+
+\begin_layout Itemize
+graph type
+\end_layout
+
+\begin_layout Itemize
+filter box and expression boxes
+\end_layout
+
+\begin_layout Itemize
+MAW and training size 
+\end_layout
+
+\begin_layout Itemize
+Machine type and learned set (if it exists)
+\end_layout
+
+\begin_layout Standard
+To create a new context, simply type a name in the field :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename p.png
+	scale 70
+	clip
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The new name is then added to the menu and can be loaded.
+\end_layout
+
+\begin_layout Standard
+Training a new set will automatically save it, and if a name is not provided
+ then it will be saved under generic name 'tmp'.
+ 
+\end_layout
+
+\begin_layout Standard
+Context are stored on the server so every user can see them and thus share
+ their own sets.
+\end_layout
+
+\begin_layout Standard
+Deleting a set is not possible for now and must be manually done by the
+ developers.
+\end_layout
+
+\begin_layout Section
+Machine Learning
+\end_layout
+
+\begin_layout Standard
+BPL Research offers some machine learning features: from a given set of
+ data a machine can be trained and forecasts a specific output.
+\end_layout
+
+\begin_layout Standard
+Machine input and output are defined the same way as graphs: Filters are
+ applied to the selected stack and an expression is eventually computed.
+ 
+\end_layout
+
+\begin_layout Standard
+From there, 'Learn' button will start training.
+ The reference output is the first value defined in the Expression Box (by
+ default it is the top sensor on the stack) at T + 1 tick.
+\end_layout
+
+\begin_layout Standard
+Inputs are the other values at T.
+ Learning results are shown as a graph comparing training values to forecast.
+\end_layout
+
+\begin_layout Standard
+Training parameters are :
+\end_layout
+
+\begin_layout Itemize
+MAW : moving average period (in ticks).
+ A training/forecast can be performed on moving average data instead of
+ raw data.
+ A MAW of 1 means no moving average.
+\end_layout
+
+\begin_layout Itemize
+Train size: size of training set as a percentage of the input set.
+ The training set is uniformely sampled from the data set.
+\end_layout
+
+\begin_layout Itemize
+Machine type: as of today : K-Nearest neighbor, Perceptron, Forest tree
+ and SVM.
+ 
+\end_layout
+
+\begin_layout Standard
+Machine learning is entirely based on the Python Sci Kit libraries, and
+ adding new models can be done easily.
+ More information on SciKit :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://scikit-learn.org/stable/index.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So far, we have noticed that the best regressor seems to be SVM.
+\end_layout
+
+\begin_layout Standard
+After training ('Learn' button), the trained set is saved as part of the
+ selected configuration and it's then possible to run it against a different
+ set of parameters, by modifying the sensor stack or the expression box.
+ Beware of the fact that the number of input must be the same.
+ 
+\end_layout
+
+\begin_layout Section
+Notes on code
+\end_layout
+
+\begin_layout Standard
+The entire application is based on Python, the front end being HTML/JavaScript
+ and the framework is based from Django.
+ 
+\end_layout
+
+\begin_layout Standard
+Source is available from CVS : :pserver:eric@rscript.cisdd.org:/home/eric/cvsrepo
+\end_layout
+
+\end_body
+\end_document
