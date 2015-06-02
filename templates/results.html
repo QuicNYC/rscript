@@ -1,0 +1,14 @@
+<h1>{{ poll.question }}</h1>
+
+<ul>
+{% for choice in poll.choice_set.all %}
+    <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
+{% endfor %}
+</ul>
+
+<a href="{% url 'details' poll.id %}">Vote again?</a>
+<form action="" method="post" id="contactform">
+    <div id="ajaxwrapper">
+    {% csrf_token %}
+    {{ form.as_p }}
+    </div>

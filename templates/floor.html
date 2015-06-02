@@ -1,0 +1,620 @@
+{% load dajaxice_templatetags %}
+<html xmlns="http://www.w3.org/1999/html"/>
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}dhtmlxTree/codebase/dhtmlxtree.css">
+<script src="{{STATIC_URL}}dhtmlxTree/codebase/dhtmlxcommon.js"></script>
+<script src="{{STATIC_URL}}dhtmlxTree/codebase/dhtmlxtree.js"></script>
+<script src="{{STATIC_URL}}dhtmlxTree/codebase/ext/dhtmlxtree_json.js"></script>
+<script src="{{ STATIC_URL }}dist/libs/jquery.js"></script>
+<script src="{{ STATIC_URL }}dist/jstree.min.js"></script>
+<script type='text/javascript' src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<style type="text/css">
+            textarea {
+               resize: none;
+            }
+            p
+            {
+                background-color: #F6AF3A;
+            }
+            .readable
+            {
+                 font-size: 1em;
+                 witdh:25 em;
+            }
+            .div
+            {
+                border:1px solid #DDD;
+                display:flex;
+                align-items:center;
+                align-content:space-around;
+                font-size: 0.8em;
+                background-color: #F6AF3A;
+            }
+
+            .body
+            {
+                font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
+				font-size: 0.9em;
+				background-color: #EEE;
+				color: #333;
+				border: 1px solid #DDD;
+				-moz-border-radius: 4px;
+				-webkit-border-radius: 4px;
+				border-radius: 4px;
+				padding: 0.2em;
+				width: 17em;
+            }
+			.calendar {
+				font-family: 'Trebuchet MS', Tahoma, Verdana, Arial, sans-serif;
+				font-size: 0.9em;
+				background-color: #EEE;
+				color: #333;
+				border: 1px solid #DDD;
+				-moz-border-radius: 4px;
+				-webkit-border-radius: 4px;
+				border-radius: 4px;
+				padding: 0.2em;
+				width: 14em;
+			}
+
+			.calendar .months {
+				background-color: #F6AF3A;
+				border: 1px solid #E78F08;
+				-moz-border-radius: 4px;
+				-webkit-border-radius: 4px;
+				border-radius: 4px;
+				color: #FFF;
+				padding: 0.2em;
+				text-align: center;
+			}
+
+			.calendar .prev-month,
+			.calendar .next-month {
+				padding: 0;
+			}
+
+			.calendar .prev-month {
+				float: left;
+			}
+
+			.calendar .next-month {
+				float: right;
+			}
+
+			.calendar .current-month {
+				margin: 0 auto;
+			}
+
+			.calendar .months .prev-month,
+			.calendar .months .next-month {
+				color: #FFF;
+				text-decoration: none;
+				padding: 0 0.4em;
+				-moz-border-radius: 4px;
+				-webkit-border-radius: 4px;
+				border-radius: 4px;
+				cursor: pointer;
+			}
+
+			.calendar .months .prev-month:hover,
+			.calendar .months .next-month:hover {
+				background-color: #FDF5CE;
+				color: #C77405;
+			}
+
+			.calendar table {
+				border-collapse: collapse;
+				padding: 0;
+				font-size: 0.8em;
+				width: 100%;
+			}
+
+			.calendar th {
+				text-align: center;
+			}
+
+			.calendar td {
+				text-align: right;
+				padding: 1px;
+				width: 14.3%;
+			}
+
+			.calendar td span {
+				display: block;
+				color: #1C94C4;
+				background-color: #F6F6F6;
+				border: 1px solid #CCC;
+				text-decoration: none;
+				padding: 0.2em;
+				cursor: pointer;
+			}
+
+			.calendar td span:hover {
+				color: #C77405;
+				background-color: #FDF5CE;
+				border: 1px solid #FBCB09;
+			}
+
+			.calendar td.today span {
+				background-color: #FFF0A5;
+				border: 1px solid #FED22F;
+				color: #363636;
+			}
+
+		</style>
+ </head>
+ <h1>BPL Research</h1>
+{% dajaxice_js_import %}
+    <div class="body" float="left" width="10%">
+    <p><div id = "treeBox" style ="width:240px; height:200px;background-color:#F6AF3A; overflow:auto;">
+    </div></p>
+    <div>
+        <button id="id_push" name="push" onclick=cb_push>Push</button>
+        <button id="id_pop" name="pop" onclick="cb_pop">Pop</button>
+        <button id="id_clear" name="Clear" onclick="cb_clear">Clear</button>
+        <button id="id_perm" name="Permute" onclick="cb_permute">Permute</button>
+    </div>
+        <select id="sensorlist" resize="None" name="sensorlist" style="height:60px;width:230px;" multiple></select>
+
+        <div>
+            <font size="1" >
+            Filter: (Array of Lambda in x, starts with Time, sep. with ;\n)
+            <textarea id="dtfilter" name="Date Filter:" style="width:22em;height:6em;" resize="None"></textarea>
+            </font>
+       </div>
+        <div>
+            <font size="1" >
+             Expression to Graph: (format {i})
+            <textarea id="expr" name="Expression" style="width:22em;height:6em;" resize="None"></textarea>
+            </font>
+
+       </div>
+       <div>
+        <select id="id_graphtype" name="Type">
+            <option value="1">Time Series</option>
+            <option value="2">Moving Std</option>
+            <option value="3">XY</option>
+            <option value="4">Correl</option>
+            <option value="5">Frequencies</option>
+        </select>
+	    <button id="graph">GRAPH</button>
+	    <button id="csv">CSV</button>
+        </div>
+         <div>
+            <font size="1" >
+             Expression to Learn: (format {i})
+            <textarea id="exprl" name="Expression2" style="width:22em;height:6em;" resize="None"></textarea>
+            </font>
+       </div>
+       <div>
+            MAW:<input id="id_maw" type="text" value="10" resize="None" style="height:20px;width:40px;" onkeypress='return event.charCode >= 48 && event.charCode <= 57'></input>
+            train size:<input id="id_pct" type="text" value="10" resize="None" style="height:20px;width:40px;" onkeypress='return event.charCode >= 48 && event.charCode <= 57'></input>
+            <select id="id_machinetype" name="Machine Type">
+            <option value="1">KNN</option>
+            <option value="2">PA Regressor</option>
+            <option value="3">Ada Boost</option>
+            <option value="4">SVM</option>
+            </select>
+            <button id="id_train">TRAIN</button>
+	    <button id="id_run">RUN</button>
+        </div>
+        <p>
+            <select id="id_conflist" name="conflist"resize="None"style="height:40px;width:100px;"></select>
+            <button id="id_load">Load</button>
+            <textarea id="id_saveas" name="saveas" style="width:100px;height:18px;"resize="None"></textarea>
+            <button id="id_save">Save</button>
+        </p>
+          <font size="1" >
+          <div id='log' style="overflow:auto;background-color: #EEE; border:1px solid #DDD;display:flex;width:29em;height:15em"></div>
+          </font>
+         </div>
+    </div>
+    </body>
+    <div class="div" float="right" witdth="90%">
+        <script src="{{ STATIC_URL }}js/highstock.js"></script>
+        <script src="{{ STATIC_URL }}js/modules/exporting.js"></script>
+        <div float = "right" id='containerG' style='background-color: #EEE; border:1px solid #DDD;display:flex;position:fixed; width:80em;height:28em;top:1em;left:24em;'></div>
+    </div>
+    <div class="div" float="right" witdth="90%">
+        <script src="{{ STATIC_URL }}js/highstock.js"></script>
+        <script src="{{ STATIC_URL }}js/modules/exporting.js"></script>
+        <div float = "right" id='containerT' style='background-color: #EEE; border:1px solid #DDD;display:flex;position:fixed; width:80em;height:28em;top:28em;left:24em;'></div>
+    </div>
+<script>
+
+var tree = new dhtmlXTreeObject("treeBox","100%","100%",0);
+var request = (window.XMLHttpRequest) ? new XMLHttpRequest() : (window.ActiveXObject ? new window.ActiveXObject("Microsoft.XMLHTTP") : false);
+var log = "/Users/eric/Sites/logs/building-error_log"
+var curr_json;
+function tree_init(){
+    tree.setImagePath("{{STATIC_URL}}dhtmlxTree/codebase/imgs/");
+    tree.setSkin('dhx_skyblue');
+    tree.setImagePath("{{STATIC_URL}}dhtmlxTree/codebase/imgs/csh_bluebooks/");
+    tree.setDataMode("json");
+    tree.enableCheckBoxes(1);
+    tree.enableThreeStateCheckboxes(true);
+}
+function cb_clear(){
+    document.getElementById('sensorlist').innerHTML="";
+}
+
+function cb_push(){
+    var l1 = tree.getAllChecked().split(',');
+    for (i=0;i<l1.length;i++){
+        var result = l1[i].match(/Type/g)
+        if (result != null)
+             continue;
+        result = l1[i].match(/Floor/g)
+        if (result != null)
+            continue;
+       l = l1[i].split('-')
+       opt = document.createElement("option");
+       opt.textContent = l[1];
+       opt.value = l[0];
+       var tg = document.getElementById('sensorlist');
+       tg.add(opt,opt.value);
+    }
+    tree.setSubChecked('0',false)
+ }
+
+ function cb_pop(){
+    var l = document.getElementById('sensorlist');
+    var ind = l.options.length-1
+
+    for (i=0; i<= ind;i++){
+        var item = l.options[i];
+        if (item.selected){
+           ind = i;
+           break;
+        }
+    }
+    var item = l.options[i];
+    l.remove(ind);
+    return item;
+ }
+
+ function cb_permute(){
+     lst = cb_pop();
+     fst = document.getElementById('sensorlist').options[0];
+     document.getElementById('sensorlist').insertBefore(lst,fst)
+ }
+
+ function callback_load(){
+    tree_init();
+    Dajaxice.building.getSensorTree(callback_settree);
+    Dajaxice.building.getConfList(cb_setconflist);
+    tail('start',log, 20)
+ }
+
+ function callback_settree(t){
+    ar = t.message;
+    tree.loadJSONObject(ar);
+}
+
+function callback_Sensors(data){
+    var dd = document.getElementById('id_Sensor')
+    dd.innerHTML="";
+    data.message.forEach(function(entry) {
+        opt = document.createElement("option");
+        opt.value = entry.id;
+        opt.textContent = entry.name;
+        dd.add(opt,0);
+    });
+    dd.value=0
+}
+
+function cb_changetype(){
+    if  (document.getElementById('id_graphtype').value != "23")
+        document.getElementById('expr').style.display='block';
+    else
+        document.getElementById('expr').style.display='none';
+}
+function cb_changemtype(){
+    if  (document.getElementById('id_machinetype').value != "23")
+        document.getElementById('expr').style.display='block';
+    else
+        document.getElementById('expr').style.display='none';
+}
+
+function cb_getgraph(){
+    var lists = new Array();
+    for (i=0;i<document.getElementById('sensorlist').options.length;i++){
+        lists[i] = document.getElementById('sensorlist')[i].value;
+    }
+    var dtfilter = document.getElementById('dtfilter').value
+    var expression = document.getElementById('expr').value
+    var expressionl = document.getElementById('exprl').value
+    var graphid = document.getElementById('id_graphtype').value-1;
+    var graphtype = document.getElementById('id_graphtype')[graphid].textContent;
+    var cargs= {'lists':lists,
+       'graphtype':graphtype,
+       'dtfilter':dtfilter,
+       'expression':expression,
+       'mtype':'none',
+       'maw':0,
+       'pct':0,
+       'mname':'tmp',
+       'learn':false
+    };
+    Dajaxice.building.getGraph(callback_draw,cargs);
+}
+function cb_getcsv(){
+    callback_csv(curr_json)
+}
+
+function cb_forecast(){
+    cb_run(false)
+}
+function cb_train(){
+    cb_run(true)
+}
+function cb_run(learn){
+    var lists = new Array();
+    for (i=0;i<document.getElementById('sensorlist').options.length;i++){
+        lists[i] = document.getElementById('sensorlist')[i].value;
+    }
+    var dtfilter = document.getElementById('dtfilter').value
+    var expression = document.getElementById('exprl').value
+    var lid = document.getElementById('id_machinetype').value-1;
+    var ltype = document.getElementById('id_machinetype')[lid].textContent;
+    var maw = document.getElementById('id_maw').value
+    var pct = document.getElementById('id_pct').value
+    var cargs= {'lists':lists,
+       'graphtype':'Learn',
+       'dtfilter':dtfilter,
+       'expression':expression,
+       'mtype':ltype,
+       'maw':maw,
+       'pct':pct,
+       'mname':get_confname(),
+       'learn':learn
+    };
+    Dajaxice.building.getGraph(callback_drawT,cargs);
+    if (learn){
+        cb_saveconf()
+    }
+}
+
+function callback_csv(jsondata)
+{
+    var series = new Array();
+    var dt = jQuery.parseJSON(jsondata.message);
+    var array = typeof dt != 'object' ? JSON.parse(dt) : dt;
+    var str = '';
+     
+    for (var i = 0; i < array.length; i++) {
+        var line = '';
+        for (var index in array[i]) {
+            if(line != '') line += ','
+         
+            line += array[i][index];
+        }
+ 
+        str += line + '\r\n';
+    }
+ 
+    if (navigator.appName != 'Microsoft Internet Explorer')
+    {
+        window.open('data:text/csv;charset=utf-8,' + escape(str));
+    }
+    else
+    {
+        var popup = window.open('','csv','');
+        popup.document.body.innerHTML = '<pre>' + str + '</pre>';
+    }          
+}
+
+function callback_draw(jsondata){
+    var series = new Array();
+    var dt = jQuery.parseJSON(jsondata.message);
+    var arg = jsondata.arg
+    curr_json = dt
+    if (arg == 'StockChart'){
+        for (i=0;i< dt.length;i++){
+            dt[i].data = jQuery.parseJSON(dt[i].data);
+        }
+        $('#containerG').highcharts(arg, {
+			rangeSelector : {
+				selected : 1
+			},
+
+			title : {
+				text : 'Raw Series'
+			},
+			series : dt
+		});
+	}
+	else if (arg == 'scatter'){
+	    for (i=0;i< dt.length;i++){
+            dt[i].data = jQuery.parseJSON(dt[i].data);
+        }
+	    $('#containerG').highcharts({
+			rangeSelector : {
+				selected : 1
+			},
+            chart: {
+                type: 'scatter',
+                zoomType: 'xy'
+            },
+			title : {
+				text : 'XY'
+			},
+			series : dt
+	        });
+	    }
+	    else if (arg == 'Histogram') {
+	        var bins = Array();
+	        for (i=0;i< 1;i++){
+	            dt[i].data = jQuery.parseJSON(dt[i].data);
+                bins[i] = dt[i].bins;
+            }
+	    $('#containerG').highcharts({
+	         xAxis:{
+                 categories: bins[0],
+                 labels:{
+                    rotation:-90,
+                    y:40,
+                    style: {
+                        fontSize:'8px',
+                        fontWeight:'normal',
+                        color:'#333'
+                    },
+                },
+            },
+			rangeSelector : {
+				selected : 1
+			},
+            chart: {
+                type: 'column',
+                zoomType: 'xy'
+            },
+			title : {
+				text : 'Frequency Distribution'
+			},
+			plotOptions: {
+			    column: {
+                pointPadding: 0,
+                borderWidth: 0,
+                groupPadding: 0,
+                shadow: false
+                }
+			},
+			series :  dt
+	    });
+	}
+}
+
+function callback_drawT(jsondata){
+    var series = new Array();
+    var dt = jQuery.parseJSON(jsondata.message);
+    var arg = jsondata.arg
+    for (i=0;i< dt.length;i++){
+        dt[i].data = jQuery.parseJSON(dt[i].data);
+    }
+    if (arg == 'StockChart')
+        $('#containerT').highcharts(arg, {
+			rangeSelector : {
+				selected : 1
+			},
+
+			title : {
+				text : 'Forecast'
+			},
+			series : dt
+		});
+}
+function get_confname(){
+    var saveas = document.getElementById('id_saveas').value;
+    if (saveas == ''){
+        saveas = 'tmp'
+    }
+    return saveas;
+}
+
+function cb_setconflist(jsondata){
+    var dd = document.getElementById('id_conflist')
+    dd.innerHTML="";
+    jsondata.message.forEach(function(entry) {
+        opt = document.createElement("option");
+        opt.value = entry.id;
+        opt.textContent = entry.name;
+        dd.add(opt);
+    });
+    dd.value=jsondata.arg
+
+}
+function cb_setconf(jsondata){
+   document.getElementById('sensorlist').innerHTML="";
+   jsondata.message.list.forEach(function(entry) {
+       opt = document.createElement("option");
+       opt.textContent = entry[0];
+       opt.value = entry[1];
+       var tg = document.getElementById('sensorlist');
+       tg.add(opt,opt.value);
+   });
+   document.getElementById('dtfilter').value = jsondata.message.dtfilter;
+   document.getElementById('expr').value = jsondata.message.expression;
+   document.getElementById('exprl').value = jsondata.message.expressionl;
+   document.getElementById('id_graphtype').value = jsondata.message.graphtype;
+   document.getElementById('id_machinetype').value = jsondata.message.mtype;
+   document.getElementById('id_maw').value = jsondata.message.maw;
+   document.getElementById('id_pct').value = jsondata.message.pct;
+   document.getElementById('id_saveas').value = jsondata.message.id
+}
+function cb_saveconf(){
+    var lists = new Array();
+    for (i=0;i<document.getElementById('sensorlist').options.length;i++){
+        lists[i] = document.getElementById('sensorlist')[i].value;
+    }
+    var dtfilter = document.getElementById('dtfilter').value
+    var expression = document.getElementById('expr').value
+    var expressionl = document.getElementById('exprl').value
+    var graphid = document.getElementById('id_graphtype').value;
+    var saveas = get_confname()
+    var lid = document.getElementById('id_machinetype').value;
+    var maw = document.getElementById('id_maw').value;
+    var pct = document.getElementById('id_pct').value;
+    var cargs= {
+        'name':saveas,
+        'lists':lists,
+        'graphtype':graphid,
+        'dtfilter':dtfilter,
+        'expression':expression,
+        'expressionl':expressionl,
+        'mtype':lid,
+        'maw': maw,
+        'pct':pct
+    };
+    Dajaxice.building.saveConf(cb_setconflist,cargs);
+}
+function cb_loadconf(){
+    var nameid = document.getElementById('id_conflist').value;
+    var name = document.getElementById('id_conflist')[nameid].textContent;
+    var cargs= {
+        'name':name
+    };
+    Dajaxice.building.getConf(cb_setconf,cargs);
+}
+function getLog(log, lines) {
+        var url = "{{STATIC_URL}}getLogFile.php?log=" + log + "&lines=" + lines;
+        request.open("GET", url, true);
+        request.onreadystatechange = updatePage;
+        request.send(null);
+}
+
+function tail(command,log,lines) {
+    if (command == "start") {
+            timer = setInterval(function() {getLog(log,lines);},5000);
+    } else {
+            clearTimeout(timer);
+    }
+}
+
+function updatePage() {
+        if (request.status == 200) {
+                var currentLogValue = request.responseText.split("\n");
+                eval(currentLogValue);
+                document.getElementById("log").innerHTML = currentLogValue;
+        }
+}
+
+
+window.onload=callback_load;
+document.getElementById('id_push').onclick=cb_push;
+document.getElementById('id_pop').onclick=cb_pop;
+document.getElementById('id_clear').onclick=cb_clear;
+document.getElementById('id_perm').onclick=cb_permute;
+document.getElementById('graph').onclick=cb_getgraph;
+document.getElementById('csv').onclick=cb_getcsv;
+document.getElementById('id_train').onclick=cb_train;
+document.getElementById('id_run').onclick=cb_forecast;
+document.getElementById('expr').style.display='block';
+document.getElementById('id_graphtype').onchange=cb_changetype;
+document.getElementById('id_machinetype').onchange=cb_changemtype;
+document.getElementById('id_save').onclick = cb_saveconf;
+document.getElementById('id_load').onclick = cb_loadconf;
+</script>
+
+</html>
+
+
+
